@@ -1,0 +1,104 @@
+import java.awt.Color;
+
+import java.awt.Container;
+
+import java.awt.Graphics;
+
+import java.awt.event.ActionEvent;
+
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+
+import javax.swing.JFrame;
+
+import javax.swing.JPanel;
+import java.util.Random;
+
+public class GraphicsDemoThread extends JFrame {
+
+    JPanel panel = new JPanel();
+    Graphics g;
+    JButton btn = new JButton("Добавить строку");
+    int i;
+
+    public GraphicsDemoThread() {
+        setBounds(100, 200, 470, 350);
+        Container contentPane = getContentPane();
+        contentPane.setLayout(null);
+        btn.setBounds(50, 10, 160, 20);
+        contentPane.add(btn);
+        panel.setBounds(30, 40, 400, 200);
+        panel.setBackground(Color.WHITE);
+        contentPane.add(panel);
+
+        btn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                new HelloThread(panel).start();
+                i++;  repaint();
+            } });   }
+
+    public static void main(String[] args) {
+        GraphicsDemoThread frame =new GraphicsDemoThread();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+
+    }
+
+    public void paint(Graphics g){
+        super.paint(g);
+        g.drawString("Количество строк: " + i, 65, 300);
+    }  }
+
+class HelloThread extends Thread {
+    JPanel panel;
+    private int posX, posY;
+    private int priviousPosX, priviousPosY;
+    private final int textWidth = 60;
+    private final int textHeight = 10;
+    private double alpha;
+    private int SPEED = 4;
+    Color color = Color.BLACK;
+    Random random = new Random();
+    HelloThread(JPanel p) {
+        this.panel = p;
+        posX = (panel.getWidth() - textWidth);
+        posY = (panel.getHeight() - textHeight)/2 ;
+        alpha = 180;
+    }
+
+    public void run() {
+        while(true) {
+            priviousPosX = posX;
+            posX += (int)(SPEED * Math.cos(alpha));
+            if( posX >= panel.getWidth()-textWidth) {
+                alpha= Math.PI - alpha;
+            float red = random.nextFloat();
+            float green = random.nextFloat();
+            float blue = random.nextFloat();
+                color = new Color(red, green, blue);
+            }
+            else if( posX <= 0 ) {
+                alpha = Math.PI - alpha;
+                float red = random.nextFloat();
+                float green = random.nextFloat();
+                float blue = random.nextFloat();
+                color = new Color(red, green, blue);
+            }
+            paint(panel.getGraphics());
+        }
+    }
+
+    public void paint(Graphics g) {
+
+        try {
+            sleep(20);
+        } catch(InterruptedException e) {
+            e.printStackTrace();  }
+        g.setColor(Color.WHITE);
+        g.drawString("Hello World", priviousPosX , posY);
+        g.setColor(color);
+        g.drawString("Hello World", posX , posY);
+
+    }
+}
